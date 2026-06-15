@@ -15,7 +15,7 @@ import { connectDB } from "./lib/db.js";
 const app = express();
 
 const PORT = process.env.PORT || 3000;
-const FRONTEND_URL = process.env.FORNTEND_URL;
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 const publicDir = path.join(process.cwd(), "public");
 
@@ -32,9 +32,11 @@ app.get("/health", (req, res) => {
 
 if(fs.existsSync(publicDir)){
     app.use(express.static(publicDir));
-    app.get("/*",(req,res,next) => {
-        res.sendFile(path.join(publicDir, "index.html"), (err) => next(err));
+    app.use((req, res, next) => {
+    res.sendFile(path.join(publicDir, "index.html"), (err) => {
+        if (err) next(err);
     });
+});
 }
 
 app.listen(PORT, () => {
