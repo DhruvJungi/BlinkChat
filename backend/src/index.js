@@ -9,6 +9,8 @@ import path from "path";
 
 import {clerkMiddleware} from "@clerk/express";
 
+import job from "./cron.js";
+
 import User from "./models/user.model.js";
 import { connectDB } from "./lib/db.js";
 
