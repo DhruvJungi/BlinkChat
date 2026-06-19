@@ -16,7 +16,7 @@ export async function protectRoute(req, res, next){
             return;
         }
 
-        req.user = user
+        req.user = user;
         next()
     } catch (error) {
         console.error("Error in protectRoute middleware:", error.message);
