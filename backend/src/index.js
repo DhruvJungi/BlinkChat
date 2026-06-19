@@ -9,6 +9,8 @@ import path from "path";
 
 import {clerkMiddleware} from "@clerk/express";
 
+import { app, server } from "./lib/socket.js";
+
 import job from "./lib/cron.js";
 
 import User from "./models/user.model.js";
@@ -18,7 +20,7 @@ import clerkWebhook from "./webhooks/clerk.webhook.js";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 
-const app = express();
+
 
 const PORT = process.env.PORT || 3000;
 const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -52,7 +54,7 @@ if(fs.existsSync(publicDir)){
 });
 }
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
     connectDB();
 

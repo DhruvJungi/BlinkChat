@@ -1,6 +1,10 @@
-import User from "../models/user.model.js"
-import Message from "../models/message.model.js"
+import User from "../models/user.model.js";
+import Message from "../models/message.model.js";
+import { getReceiverSocketId, io } from "../lib/socket.js";
+import { uploadChatMedia, hasImageKitConfig } from "../lib/imagekit.js";
+
 export async function getUsersForSidebar(req, res){
+
     try {
         const loggedInUserId = req.user._id
 
@@ -78,12 +82,13 @@ export async function sendMessages(req, res){
             }
 
             const url = await uploadChatMedia(req.file);
-            if (req.file.mimetype.startsWith("/video")) videoUrl = url;
+            if (req.file.mimetype.startsWith("video/")) videoUrl = url;
             else imageUrl = url;
+
         }
         const newMessage = new Message({
             senderId,
-            recevierId,
+            receiverId,
             text,
             image:imageUrl,
             video:videoUrl,
@@ -91,8 +96,15 @@ export async function sendMessages(req, res){
 
         await newMessage.save()
 
-        //todo: realtime with socket.io
-        re.status(201).json(newMessage)
+        
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        // only send the message in realtime if user is online 
+        if(receiverSocketId){
+            io.to(receiverSocketId).emit("newMessage", newMessage);
+        }
+        return res.status(201).json(newMessage);
+
+
 
     } catch (error){
         console.error("Error in sendMessage:", error.message);
